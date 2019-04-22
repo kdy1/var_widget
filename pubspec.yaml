@@ -1,8 +1,8 @@
 name: var_widget
 description: A new state manangment for flutter
 version: 0.0.1
-author:
-homepage:
+author: 강동윤 <kdy1@outlook.kr>
+homepage: 'https://github.com/kdy1/var_widget'
 
 environment:
   sdk: ">=2.0.0 <3.0.0"
@@ -10,6 +10,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  meta: ^1.1.6
 
 dev_dependencies:
   flutter_test:
