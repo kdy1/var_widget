@@ -49,27 +49,51 @@ void _tests() {
 
       expect(
         () => mapped.value,
-        throwsA(isInstanceOf<LazyException>()),
-        reason: 'value of mapped widget is accessible only from notifyListeners',
+        _throwsLazyException(),
+        reason: ".value of `mapped` widget is accessible only from notifyListeners and it's dependencies",
       );
     });
   });
 
   group('.computed', () {
-    Var<int> v;
+    int value = 0;
+    ComputedValue<int> v;
 
     setUp(() {
-      v = new Var(0);
+      v = Value.computed(() => value);
     });
 
-    tearDown(() {
-      v.close();
-    });
+    test('usage', () {
+      var values = [];
+      v.addListener(() {
+        values.add(v.value);
+      });
 
-    test('usage', () {});
+      value = 10;
+
+      expect(
+        values,
+        equals([]),
+        reason: '`.computed` does not update value until .refresh is called',
+      );
+
+      v.refresh();
+
+      expect(
+        values,
+        equals([10]),
+        reason: '`.computed` updates value when .refresh is called',
+      );
+    });
 
     test('invalid access', () {
-      Value.computed(() => v.value);
+      v.addListener(() {});
+
+      expect(
+        () => v.value,
+        _throwsLazyException(),
+        reason: ".value of `computed` widget is accessible only from notifyListeners and it's dependencies",
+      );
     });
   });
 
@@ -139,4 +163,8 @@ void _tests() {
       v.close();
     });
   });
+}
+
+Matcher _throwsLazyException() {
+  return throwsA(isInstanceOf<LazyException>());
 }
