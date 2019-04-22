@@ -36,7 +36,6 @@ void _tests() {
         reason: 'should not be updated yet',
       );
 
-      await tester.runAsync(() => Future.value(null));
       await tester.pump();
 
       expect(
