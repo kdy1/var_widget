@@ -49,7 +49,7 @@ void _tests() {
 
       expect(
         () => mapped.value,
-        throwsAssertionError,
+        throwsA(isInstanceOf<LazyException>()),
         reason: 'value of mapped widget is accessible only from notifyListeners',
       );
     });

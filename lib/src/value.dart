@@ -1,13 +1,16 @@
 import 'dart:async';
-import 'dart:developer';
 
 import 'package:flutter/foundation.dart';
-import 'package:flutter/widgets.dart';
 import 'package:meta/meta.dart';
 
 final _debugVarScopeKey = new Object();
+final _debugNotifingListeners = new Object();
 
-T _run<T>(List<Listenable> deps, ValueGetter<T> op) {
+T _run<T>(
+  List<Listenable> deps,
+  ValueGetter<T> op, {
+  bool isNotifyListenables = false,
+}) {
   bool debug = false;
   assert(() {
     debug = true;
@@ -15,18 +18,23 @@ T _run<T>(List<Listenable> deps, ValueGetter<T> op) {
   }());
   if (!debug) return op();
 
-  debugPrint('$deps');
-
   deps = deps.expand((l) {
     if (l is _MergedListenable) return l._listenables;
     return [l];
   }).toList(growable: false);
 
+  final zoneValues = <dynamic, dynamic>{
+    _debugVarScopeKey: deps,
+  };
+  if (isNotifyListenables) {
+    zoneValues.addAll({
+      _debugNotifingListeners: true,
+    });
+  }
+
   return runZoned(
     op,
-    zoneValues: <dynamic, dynamic>{
-      _debugVarScopeKey: deps,
-    },
+    zoneValues: zoneValues,
   );
 }
 
@@ -171,7 +179,11 @@ class Var<T> extends NotifyingValue<T> implements Sink<T> {
     if (_value == newValue) return;
     _value = newValue;
 
-    notifyListeners();
+    _run(
+      [],
+      super.notifyListeners,
+      isNotifyListenables: true,
+    );
   }
 
   @override
@@ -224,10 +236,16 @@ abstract class BaseComputedValue<T> extends NotifyingValue<T> {
   @override
   T get value {
     assert(() {
+      if (Zone.current[_debugNotifingListeners] == true) {
+        return true;
+      }
+
       List<Listenable> deps = Zone.current[_debugVarScopeKey];
       if (deps != null) {
         if (deps.contains(this)) return true;
       }
+
+      debugPrint('Deps: $deps; this: #${shortHash(this)}');
 
       throw new LazyException(
         debugLabel: debugLabel,
@@ -252,12 +270,10 @@ abstract class BaseComputedValue<T> extends NotifyingValue<T> {
 
   @override
   void notifyListeners() {
-    Timeline.timeSync(
-      'Notify listeners',
+    _run(
+      [],
       super.notifyListeners,
-      arguments: <String, dynamic>{
-        'debugLabel': debugLabel,
-      },
+      isNotifyListenables: true,
     );
   }
 
@@ -282,7 +298,11 @@ abstract class ListeningValue<T> extends BaseComputedValue<T> {
 
   @override
   void update() {
-    _run([this._listenable], super.update);
+    _run(
+      [this._listenable],
+      super.update,
+      isNotifyListenables: true,
+    );
   }
 
   @override
