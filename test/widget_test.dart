@@ -9,17 +9,17 @@ void main() {
 }
 
 void _tests() {
+  Var<String> v;
+
+  setUp(() {
+    v = new Var('');
+  });
+
+  tearDown(() {
+    v.close();
+  });
+
   group('VarWidget', () {
-    Var<String> v;
-
-    setUp(() {
-      v = new Var('');
-    });
-
-    tearDown(() {
-      v.close();
-    });
-
     testWidgets('works', (WidgetTester tester) async {
       await tester.pumpWidget(_render(v));
 
@@ -50,7 +50,41 @@ void _tests() {
     });
   });
 
-  group('VarBuilder', () {});
+  group('VarBuilder', () {
+    testWidgets('works', (WidgetTester tester) async {
+      await tester.pumpWidget(MaterialApp(
+        home: VarBuilder(
+          value: v,
+          builder: (BuildContext context, String value, Widget child) => Text(value),
+        ),
+      ));
+
+      expect(
+        find.text(''),
+        findsOneWidget,
+      );
+
+      v.value = 'foo';
+
+      expect(
+        find.text(''),
+        findsOneWidget,
+        reason: 'should not be updated yet',
+      );
+
+      await tester.pump();
+
+      expect(
+        find.text(''),
+        findsNothing,
+      );
+
+      expect(
+        find.text('foo'),
+        findsOneWidget,
+      );
+    });
+  });
 }
 
 Widget _render(Value<String> v) {
