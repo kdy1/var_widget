@@ -51,7 +51,7 @@ void _tests() {
   });
 
   group('VarBuilder', () {
-    testWidgets('works', (WidgetTester tester) async {
+    testWidgets('works with `Var`', (WidgetTester tester) async {
       await tester.pumpWidget(MaterialApp(
         home: VarBuilder(
           value: v,
@@ -81,6 +81,40 @@ void _tests() {
 
       expect(
         find.text('foo'),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('works with `.mapped`', (WidgetTester tester) async {
+      await tester.pumpWidget(MaterialApp(
+        home: VarBuilder(
+          value: v.map((String v) => 'Hello, $v'),
+          builder: (BuildContext context, String value, Widget child) => Text(value),
+        ),
+      ));
+
+      expect(
+        find.text('Hello, '),
+        findsOneWidget,
+      );
+
+      v.value = 'foo';
+
+      expect(
+        find.text('Hello, '),
+        findsOneWidget,
+        reason: 'should not be updated yet',
+      );
+
+      await tester.pump();
+
+      expect(
+        find.text('Hello, '),
+        findsNothing,
+      );
+
+      expect(
+        find.text('Hello, foo'),
         findsOneWidget,
       );
     });
