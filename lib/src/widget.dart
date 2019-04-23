@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:meta/meta.dart';
+import 'package:var_widget/var_widget.dart';
 
 abstract class VarWidget<T> extends StatefulWidget {
   final ValueListenable<T> _value;
@@ -27,6 +28,7 @@ class _VarWidgetState<T> extends State<VarWidget<T>> {
   @override
   void initState() {
     super.initState();
+    _cached = Value.get(widget._value);
     widget._value.addListener(_handleChange);
   }
 
@@ -87,7 +89,7 @@ class _VarWidgetState<T> extends State<VarWidget<T>> {
 
   @override
   Widget build(BuildContext context) {
-    widget.build(context, _cached);
+    return widget.build(context, _cached);
   }
 }
 

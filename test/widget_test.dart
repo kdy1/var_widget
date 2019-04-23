@@ -15,10 +15,6 @@ void _tests() {
     v = new Var('');
   });
 
-  tearDown(() {
-    v.close();
-  });
-
   group('VarWidget', () {
     testWidgets('works', (WidgetTester tester) async {
       await tester.pumpWidget(_render(v));

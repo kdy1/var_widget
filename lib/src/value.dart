@@ -113,6 +113,15 @@ abstract class Value<T> extends DiagnosticableTree implements ValueListenable<T>
   static ComputedValue<S> computed<S>(ValueGetter<S> op, {String debugLabel}) => ComputedValue(op, debugLabel: debugLabel);
 
   static Listenable mergeListenables(List<Listenable> listenables) => new _MergedListenable(listenables);
+
+  /// Use this only for initialization
+  static T get<T>(Value<T> value) {
+    return _run(
+      [],
+      () => value.value,
+      isNotifyListenables: true,
+    );
+  }
 }
 
 class _MergedListenable extends Listenable with ChangeNotifier {
