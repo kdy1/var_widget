@@ -9,7 +9,7 @@ final _debugNotifingListeners = new Object();
 T _run<T>(
   List<Listenable> deps,
   ValueGetter<T> op, {
-  bool isNotifyListenables = false,
+  bool byPassDepsCheck = false,
 }) {
   bool debug = false;
   assert(() {
@@ -26,7 +26,7 @@ T _run<T>(
   final zoneValues = <dynamic, dynamic>{
     _debugVarScopeKey: deps,
   };
-  if (isNotifyListenables) {
+  if (byPassDepsCheck) {
     zoneValues.addAll({
       _debugNotifingListeners: true,
     });
@@ -114,12 +114,12 @@ abstract class Value<T> extends DiagnosticableTree implements ValueListenable<T>
 
   static Listenable mergeListenables(List<Listenable> listenables) => new _MergedListenable(listenables);
 
-  /// Use this only for initialization
+  /// Use this **only** for initialization.
   static T get<T>(Value<T> value) {
     return _run(
       [],
       () => value.value,
-      isNotifyListenables: true,
+      byPassDepsCheck: true,
     );
   }
 }
@@ -191,7 +191,7 @@ class Var<T> extends NotifyingValue<T> implements Sink<T> {
     _run(
       [],
       super.notifyListeners,
-      isNotifyListenables: true,
+      byPassDepsCheck: true,
     );
   }
 
@@ -282,7 +282,7 @@ abstract class BaseComputedValue<T> extends NotifyingValue<T> {
     _run(
       [],
       super.notifyListeners,
-      isNotifyListenables: true,
+      byPassDepsCheck: true,
     );
   }
 
@@ -310,7 +310,7 @@ abstract class ListeningValue<T> extends BaseComputedValue<T> {
     _run(
       [this._listenable],
       super.update,
-      isNotifyListenables: true,
+      byPassDepsCheck: true,
     );
   }
 
