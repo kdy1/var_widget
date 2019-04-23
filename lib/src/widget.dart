@@ -4,90 +4,11 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:meta/meta.dart';
 
-/// A widget that rebuilds when the given [Listenable] changes value.
-///
-/// [ListeningWidget] is most commonly used with [Animation] objects, which are
-/// [Listenable], but it can be used with any [Listenable], including
-/// [ChangeNotifier] and [ValueNotifier].
-///
-/// [ListeningWidget] is most useful for widgets widgets that are otherwise
-/// stateless. To use [ListeningWidget], simply subclass it and implement the
-/// build function.
-///
-/// For more complex case involving additional state, consider using
-/// [AnimatedBuilder].
-///
-/// See also:
-///
-///  * [AnimatedBuilder], which is useful for more complex use cases.
-///  * [Animation], which is a [Listenable] object that can be used for
-///    [listenable].
-///  * [ChangeNotifier], which is another [Listenable] object that can be used
-///    for [listenable].
-abstract class ListeningWidget extends StatefulWidget {
-  /// Creates a widget that rebuilds when the given listenable changes.
-  ///
-  /// The [listenable] argument is required.
-  const ListeningWidget({Key key, @required this.listenable})
-      : assert(listenable != null),
-        super(key: key);
-
-  /// The [Listenable] to which this widget is listening.
-  ///
-  /// Commonly an [Animation] or a [ChangeNotifier].
-  final Listenable listenable;
-
-  /// Override this method to build widgets that depend on the state of the
-  /// listenable (e.g., the current value of the animation).
-  @protected
-  Widget build(BuildContext context);
-
-  /// Subclasses typically do not override this method.
-  @override
-  _ListeningWidgetState createState() => new _ListeningWidgetState();
-
-  @override
-  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-    super.debugFillProperties(properties);
-  }
-}
-
-class _ListeningWidgetState extends State<ListeningWidget> {
-  @override
-  void initState() {
-    super.initState();
-    widget.listenable.addListener(_handleChange);
-  }
-
-  @override
-  void didUpdateWidget(ListeningWidget oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (widget.listenable != oldWidget.listenable) {
-      oldWidget.listenable.removeListener(_handleChange);
-      widget.listenable.addListener(_handleChange);
-    }
-  }
-
-  @override
-  void dispose() {
-    widget.listenable.removeListener(_handleChange);
-    super.dispose();
-  }
-
-  void _handleChange() {
-    setState(() {
-      // The listenable's state is our build state, and it changed already.
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) => widget.build(context);
-}
-
-abstract class VarWidget<T> extends ListeningWidget {
+abstract class VarWidget<T> extends StatefulWidget {
   final ValueListenable<T> _value;
 
-  T get value => _value.value;
+  @override
+  _VarWidgetState<T> createState() => _VarWidgetState();
 
   const VarWidget({
     Key key,
@@ -95,16 +16,42 @@ abstract class VarWidget<T> extends ListeningWidget {
   })  : _value = value,
         super(
           key: key,
-          listenable: value,
         );
+
+  Widget build(BuildContext context, T value);
+}
+
+class _VarWidgetState<T> extends State<VarWidget<T>> {
+  T _cached;
+
+  @override
+  void initState() {
+    super.initState();
+    widget._value.addListener(_handleChange);
+  }
+
+  @override
+  void didUpdateWidget(VarWidget<T> oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget._value != oldWidget._value) {
+      oldWidget._value.removeListener(_handleChange);
+      widget._value.addListener(_handleChange);
+    }
+  }
+
+  @override
+  void dispose() {
+    widget._value.removeListener(_handleChange);
+    super.dispose();
+  }
 
   @override
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
     super.debugFillProperties(properties);
     properties.defaultDiagnosticsTreeStyle = DiagnosticsTreeStyle.sparse;
 
-    if (_value is DiagnosticableTree) {
-      var diag = (_value as DiagnosticableTree);
+    if (widget._value is DiagnosticableTree) {
+      var diag = (widget._value as DiagnosticableTree);
 
       properties.add(diag.toDiagnosticsNode(
         style: DiagnosticsTreeStyle.sparse,
@@ -112,7 +59,7 @@ abstract class VarWidget<T> extends ListeningWidget {
 //      diag.debugFillProperties(properties);
 //      diag.debugDescribeChildren().forEach(properties.add);
     } else {
-      final v = value;
+      final v = _cached;
 
       if (v is bool) {
         properties.add(new FlagProperty(
@@ -130,6 +77,17 @@ abstract class VarWidget<T> extends ListeningWidget {
         properties.add(new ObjectFlagProperty<T>('value', v, ifPresent: v?.toString(), ifNull: 'null', showName: true));
       }
     }
+  }
+
+  void _handleChange() {
+    setState(() {
+      _cached = widget._value.value;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    widget.build(context, _cached);
   }
 }
 
@@ -150,7 +108,7 @@ class VarBuilder<T> extends VarWidget<T> {
         );
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, T value) {
     return builder(context, value, child);
   }
 }

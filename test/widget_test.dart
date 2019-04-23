@@ -137,7 +137,7 @@ class _VarText extends VarWidget<String> {
         );
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, String value) {
     return Text(value);
   }
 }
