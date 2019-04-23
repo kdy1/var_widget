@@ -112,7 +112,7 @@ abstract class VarWidget<T> extends ListeningWidget {
 //      diag.debugFillProperties(properties);
 //      diag.debugDescribeChildren().forEach(properties.add);
     } else {
-      var v = value;
+      final v = value;
 
       if (v is bool) {
         properties.add(new FlagProperty(
