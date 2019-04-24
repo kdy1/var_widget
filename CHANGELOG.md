@@ -1,4 +1,9 @@
 
+## [0.0.4] - 2019/04/24
+
+ - Fix invalid access while printing debug information.
+ 
+ 
 ## [0.0.3] - 2019/04/24
 
  - Removes invalid access.

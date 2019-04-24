@@ -288,7 +288,7 @@ abstract class BaseComputedValue<T> extends NotifyingValue<T> {
 
   @override
   String describeValue() {
-    return '$value; (new: ${newValue()})';
+    return '${Value.get(this)}; (new: ${newValue()})';
   }
 }
 
