@@ -69,7 +69,7 @@ abstract class Value<T> extends DiagnosticableTree implements ValueListenable<T>
   bool get hasListeners;
 
   String describeValue() {
-    return '$value; ';
+    return '${get(this)}; ';
   }
 
   @override
