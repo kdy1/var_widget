@@ -1,3 +1,9 @@
-## [0.0.1] - TODO: Add release date.
 
-* TODO: Describe initial release.
+## [0.0.3] - 2019/04/24
+
+ - Removes invalid access.
+ 
+
+## [0.0.1] - 2019/04/23
+
+ - Initial release
