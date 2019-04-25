@@ -171,7 +171,7 @@ abstract class NotifyingValue<T> extends Value<T> with ChangeNotifier {
 /// A [ChangeNotifier] that holds a single value.
 ///
 /// When [value] is replaced, this class notifies its listeners.
-class Var<T> extends NotifyingValue<T> implements Sink<T> {
+class Var<T> extends NotifyingValue<T> {
   Var(
     this._value, {
     this.debugLabel,
@@ -193,16 +193,6 @@ class Var<T> extends NotifyingValue<T> implements Sink<T> {
       super.notifyListeners,
       bypassDepsCheck: true,
     );
-  }
-
-  @override
-  void add(T data) {
-    value = data;
-  }
-
-  @override
-  void close() {
-    dispose();
   }
 }
 

@@ -12,9 +12,6 @@ void _tests() {
     setUp(() {
       v = new Var(0, debugLabel: 'test-var');
     });
-    tearDown(() {
-      v.close();
-    });
 
     test('usage', () async {
       List<bool> values = [];
@@ -98,30 +95,6 @@ void _tests() {
   });
 
   group('Var', () {
-    group('Sink', () {
-      test('.add', () {
-        var called = 0;
-        final v = Var<int>(0, debugLabel: 'test-var');
-
-        v.addListener(() {
-          called++;
-        });
-
-        v.add(1);
-
-        expect(
-          v.value,
-          equals(1),
-        );
-        expect(
-          called,
-          equals(1),
-        );
-
-        v.close();
-      });
-    });
-
     test('listenable', () async {
       var called = 0, called2 = 0;
       final v = Var<int>(0, debugLabel: 'test-var');
@@ -159,8 +132,6 @@ void _tests() {
         called2,
         equals(1),
       );
-
-      v.close();
     });
   });
 }
