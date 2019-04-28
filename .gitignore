@@ -12,6 +12,6 @@ ios/Runner/GeneratedPluginRegistrant.*
 *.iml
 .idea/
 .metadata
-android/
-ios/
+/android/
+/ios/
 pubspec.lock
