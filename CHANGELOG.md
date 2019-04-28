@@ -1,3 +1,8 @@
+## [0.1.1] - 2019/04/28
+
+ - VarWidget now rebuilds when `Var` itself is changed.
+
+
 ## [0.1.0] - 2019/04/25
 
  - Var does not implement Sink

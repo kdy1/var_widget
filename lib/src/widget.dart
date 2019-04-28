@@ -38,6 +38,7 @@ class _VarWidgetState<T> extends State<VarWidget<T>> {
     if (widget._value != oldWidget._value) {
       oldWidget._value.removeListener(_handleChange);
       widget._value.addListener(_handleChange);
+      _cached = Value.get(widget._value);
     }
   }
 
