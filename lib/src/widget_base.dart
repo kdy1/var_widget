@@ -6,7 +6,7 @@ import 'package:meta/meta.dart';
 import 'package:var_widget/var_widget.dart';
 
 abstract class VarWidget<T> extends StatefulWidget {
-  final ValueListenable<T> _value;
+  final ValueListenable<T> value;
 
   @override
   _VarWidgetState<T> createState() => _VarWidgetState();
@@ -14,7 +14,7 @@ abstract class VarWidget<T> extends StatefulWidget {
   const VarWidget({
     Key key,
     @required ValueListenable<T> value,
-  })  : _value = value,
+  })  : value = value,
         super(
           key: key,
         );
@@ -28,23 +28,23 @@ class _VarWidgetState<T> extends State<VarWidget<T>> {
   @override
   void initState() {
     super.initState();
-    _cached = Value.get(widget._value);
-    widget._value.addListener(_handleChange);
+    _cached = Value.get(widget.value);
+    widget.value.addListener(_handleChange);
   }
 
   @override
   void didUpdateWidget(VarWidget<T> oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget._value != oldWidget._value) {
-      oldWidget._value.removeListener(_handleChange);
-      widget._value.addListener(_handleChange);
-      _cached = Value.get(widget._value);
+    if (widget.value != oldWidget.value) {
+      oldWidget.value.removeListener(_handleChange);
+      widget.value.addListener(_handleChange);
+      _cached = Value.get(widget.value);
     }
   }
 
   @override
   void dispose() {
-    widget._value.removeListener(_handleChange);
+    widget.value.removeListener(_handleChange);
     super.dispose();
   }
 
@@ -53,8 +53,8 @@ class _VarWidgetState<T> extends State<VarWidget<T>> {
     super.debugFillProperties(properties);
     properties.defaultDiagnosticsTreeStyle = DiagnosticsTreeStyle.sparse;
 
-    if (widget._value is DiagnosticableTree) {
-      var diag = (widget._value as DiagnosticableTree);
+    if (widget.value is DiagnosticableTree) {
+      var diag = (widget.value as DiagnosticableTree);
 
       properties.add(diag.toDiagnosticsNode(
         style: DiagnosticsTreeStyle.sparse,
@@ -84,7 +84,7 @@ class _VarWidgetState<T> extends State<VarWidget<T>> {
 
   void _handleChange() {
     setState(() {
-      _cached = widget._value.value;
+      _cached = widget.value.value;
     });
   }
 
