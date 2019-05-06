@@ -38,6 +38,10 @@ T _run<T>(
   );
 }
 
+abstract class Settable<T> extends Value<T> {
+  set value(T value);
+}
+
 abstract class Value<T> extends DiagnosticableTree implements ValueListenable<T> {
   String get debugLabel => null;
 
@@ -76,6 +80,8 @@ abstract class Value<T> extends DiagnosticableTree implements ValueListenable<T>
   String toStringShort() {
     return '${describeValue()} ${describeIdentity(this)}';
   }
+
+  Value<T> readOnly() => _ReadOnly(this);
 
   /// Returned value notifier does not support setting value.
   ListeningValue<N> map<N>(
@@ -171,7 +177,7 @@ abstract class NotifyingValue<T> extends Value<T> with ChangeNotifier {
 /// A [ChangeNotifier] that holds a single value.
 ///
 /// When [value] is replaced, this class notifies its listeners.
-class Var<T> extends NotifyingValue<T> {
+class Var<T> extends NotifyingValue<T> implements Settable<T> {
   Var(
     this._value, {
     this.debugLabel,
@@ -406,4 +412,13 @@ class _Mapped<S, T> extends ListeningValue<T> {
 
   @override
   T newValue() => _convert(_source.value);
+}
+
+class _ReadOnly<T> extends Value<T> with ChangeNotifier {
+  final Value<T> _inner;
+
+  _ReadOnly(this._inner);
+
+  @override
+  T get value => _inner.value;
 }
