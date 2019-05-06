@@ -1,3 +1,8 @@
+## [0.2.0] - 2019/05/06
+
+ - Added `Settable`
+ - Added some widgets including VarText and VarCheckbox
+
 ## [0.1.1] - 2019/04/28
 
  - VarWidget now rebuilds when `Var` itself is changed.
